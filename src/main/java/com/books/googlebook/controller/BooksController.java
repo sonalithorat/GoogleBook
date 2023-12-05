@@ -1,7 +1,6 @@
 package com.books.googlebook.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.books.googlebook.model.Books;
+import com.books.googlebook.model.BooksDto;
 import com.books.googlebook.repository.BooksRepository;
-import com.books.googlebook.service.IBookService;
+import com.books.googlebook.service.BookService;
 
 @RestController
 @RequestMapping("/api")
@@ -27,51 +26,36 @@ public class BooksController {
 	BooksRepository booksRepository;
 
 	@Autowired
-	IBookService iBookService;
+	BookService bookService;
 
 	@GetMapping("/hi")
 	public String hello() {
 		return "Hello";
 	}
-
 	@GetMapping("/getAllBooks")
-	public ResponseEntity<List<Books>> fetchAccountDetails() {
-		List<Books> books =iBookService.getAllBooks();
+	public ResponseEntity<List<BooksDto>> fetchAccountDetails() {
+		List<BooksDto> books =bookService.getAllBooks();
 		return ResponseEntity.status(HttpStatus.OK).body(books);
-
 	}
-
 	@GetMapping("/getBook/id/{id}")
-	public ResponseEntity<Optional<Books>> searchBookById(@PathVariable int id) {
-		Optional<Books> book = iBookService.getBookById(id);
+	public ResponseEntity<BooksDto> searchBookById(@PathVariable int id) {
+		BooksDto book = bookService.getBookById(id);
 		return  ResponseEntity.status(HttpStatus.OK).body(book);
 	}
-
 	@GetMapping("/getBook/{keyword}")
-	public ResponseEntity<Optional<List<Books>>> getBookByName(@PathVariable String keyword) {
-		Optional<List<Books>> books =  iBookService.getBookByTextContainingAuthorOrDescriptionOrName(keyword);
+	public ResponseEntity<List<BooksDto>> getBookByName(@PathVariable String keyword) {
+		List<BooksDto> books =  bookService.getBookByTextContainingAuthorOrDescriptionOrName(keyword);
 		return ResponseEntity.status(HttpStatus.OK).body(books);
 	}
-
 	@GetMapping("/getBook/recentlyVisited")
-	public ResponseEntity<Optional<List<Books>>> getRecentlyVisitedBook() {
-		Optional<List<Books>> books = iBookService.getRecentlyViewedBooks();
+	public ResponseEntity<List<BooksDto>> getRecentlyVisitedBook() {
+		List<BooksDto> books = bookService.getRecentlyViewedBooks();
 		return ResponseEntity.status(HttpStatus.OK).body(books);
-		
 	}
-
-	@GetMapping("/test/{name}")
-	public Optional<List<Books>> sendMessage(@PathVariable String name) {
-		Optional<List<Books>> books = booksRepository
-				.findByAuthorContainingOrByNameContainingOrByDescriptionContaining(name);
-		return books;
-	}
-
 	@PutMapping("/update")
-	public ResponseEntity<Books> update(@RequestBody Books book) {
+	public ResponseEntity<BooksDto> update(@RequestBody BooksDto book) {
 		// Optional<List<Books>> books = booksRepository.g(name);
-		Books updatedBook = iBookService.updateBookStock(book);
+		BooksDto updatedBook = bookService.updateBook(book);
 		return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
 	}
-
 }

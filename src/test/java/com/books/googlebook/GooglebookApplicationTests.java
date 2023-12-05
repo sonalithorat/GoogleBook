@@ -9,5 +9,9 @@ class GooglebookApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
+	@Test
+    void main() {
+        
+        GooglebookApplication.main(new String[]{});
+    }
 }

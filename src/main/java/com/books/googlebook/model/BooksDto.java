@@ -1,16 +1,10 @@
 package com.books.googlebook.model;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+public class BooksDto {
 
-@Document(collection = "Books")
-public class Books {
-
-	@Id
+	
 	int id;
 	String name;
 	String description;
@@ -23,6 +17,29 @@ public class Books {
 	String about;
 	String publisher;
 	boolean isBorrowed;
+	
+	
+
+	public BooksDto() {
+		super();
+	}
+
+	public BooksDto(int id, String name, String description, String author, int price, String category, int pageCount,
+			int stock, String about, String publisher, boolean isBorrowed) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.author = author;
+		this.price = price;
+		this.category = category;
+		this.pageCount = pageCount;
+		this.viewDate = viewDate;
+		this.stock = stock;
+		this.about = about;
+		this.publisher = publisher;
+		this.isBorrowed = isBorrowed;
+	}
 
 	public boolean isBorrowed() {
 		return isBorrowed;

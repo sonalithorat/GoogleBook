@@ -1,0 +1,37 @@
+#spring.data.mongodb.uri=mongodb+srv://root:root@googlebooks.3d6uop8.mongodb.net/?retryWrites=true&w=majority
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: GoogleBook
+      
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: book-events-listener-group
+      
+  
+    topic: "book-events"
+    producer:
+      bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+    admin:
+      properties:
+        bootstrap.servers: localhost:9092, localhost:9093, localhost:9094
+      
+logging:
+  level: 
+    org: 
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+
+  
