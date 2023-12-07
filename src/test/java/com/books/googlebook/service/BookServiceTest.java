@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ class BookServiceTest {
 	@Test
 	void updateBook() {
 		BooksDto dto = new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
-				"The book is written in such a way that", "Java", false);
+				"The book is written in such a way that", "Java", false, true);
 		Books book = bookService.mapTOBook(new Books(), dto);
 		when(booksRepository.save(any())).thenReturn(book);
 		assertEquals(bookService.updateBook(dto).getName(), dto.getName());
@@ -64,9 +64,9 @@ class BookServiceTest {
 	void getRecentlyViewedBooks_None() {
 		List<BooksDto> list = Stream.of(
 				new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
-						"The book is written in such a way that", "Java", false),
+						"The book is written in such a way that", "Java", false, false),
 				new BooksDto(2, ".Net", "An Integrated Approach", "Nageswara Rao", 55, "technical", 333, 0,
-						"The book is written in such a way that", "net", false))
+						"The book is written in such a way that", "net", false, true))
 				.collect(Collectors.toList());
 
 		List<Books> data = new ArrayList<>();
@@ -80,6 +80,29 @@ class BookServiceTest {
 	}
 
 	@Test
+	void getCartItems() {
+		when(booksRepository.findAll()).thenReturn(getDummyData());
+		assertEquals(2, bookService.getCartItems().size());
+	}
+
+	@Test
+	void getCartItems_None() {
+		List<BooksDto> list = Stream.of(
+				new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
+						"The book is written in such a way that", "Java", false, false),
+				new BooksDto(2, ".Net", "An Integrated Approach", "Nageswara Rao", 55, "technical", 333, 0,
+						"The book is written in such a way that", "net", false, false))
+				.collect(Collectors.toList());
+		List<Books> data = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			Books dto = bookService.mapTOBook(new Books(), list.get(i));
+			data.add(dto);
+		}
+		when(booksRepository.findAll()).thenReturn(data);
+		assertEquals(0, bookService.getCartItems().size());
+	}
+	
+	@Test
 	void getAllBooks() {
 		when(booksRepository.findAll()).thenReturn(getDummyData());
 		assertEquals(2, bookService.getAllBooks().size());
@@ -88,12 +111,21 @@ class BookServiceTest {
 	@Test
 	void getBookById() throws JsonProcessingException {
 		BooksDto dto = new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
-				"The book is written in such a way that", "Java", false);
+				"The book is written in such a way that", "Java", false, true);
 		Books book = bookService.mapTOBook(new Books(), dto);
 		Optional<Books> op = Optional.of(book);
 		when(booksRepository.findById(1)).thenReturn(op);
 		when(bookEventProducer.sendLibraryEvent(any())).thenReturn(any());
 		assertTrue(bookService.getBookById(1).getName().equals(dto.getName()));
+	}
+
+	@Test
+	void getBookById_Exception() throws JsonProcessingException {
+		Optional<Books> op = Optional.empty();
+		when(booksRepository.findById(1)).thenReturn(op);
+		BooksDto result = bookService.getBookById(1);
+		verify(bookEventProducer, never()).sendLibraryEvent(any(Books.class));
+		assertEquals(null, result);
 	}
 
 	@Test
@@ -108,9 +140,9 @@ class BookServiceTest {
 	private List<Books> getDummyData() {
 		List<BooksDto> list = Stream.of(
 				new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
-						"The book is written in such a way that", "Java", false),
+						"The book is written in such a way that", "Java", false, true),
 				new BooksDto(2, ".Net", "An Integrated Approach", "Nageswara Rao", 55, "technical", 333, 0,
-						"The book is written in such a way that", "net", false))
+						"The book is written in such a way that", "net", false, true))
 				.collect(Collectors.toList());
 
 		List<Books> data = new ArrayList<>();

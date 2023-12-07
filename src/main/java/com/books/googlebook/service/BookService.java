@@ -1,9 +1,7 @@
 package com.books.googlebook.service;
 
-import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -16,7 +14,6 @@ import com.books.googlebook.entity.Books;
 import com.books.googlebook.kafka.producer.BookEventProducer;
 import com.books.googlebook.model.BooksDto;
 import com.books.googlebook.repository.BooksRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Service
 public class BookService {
@@ -27,19 +24,12 @@ public class BookService {
 	@Autowired
 	BookEventProducer bookEventProducer;
 
-//	@Override
-//	public BooksDto updateBookStock(BooksDto book) {
-//		book.setStock(book.getStock());
-//		updateBook(book);
-//		return book;
-//	}
-
 	public BooksDto updateBook(BooksDto booksDto) {
 		Books book = mapTOBook(new Books(), booksDto);
 		bookRepository.save(book);
 		return booksDto;
 	}
-
+	
 	public List<BooksDto> getRecentlyViewedBooks() {
 		List<Books> books = bookRepository.findAll();
 		List<Books> data = books.stream().filter((a) -> {
@@ -60,6 +50,25 @@ public class BookService {
 		return booksDto;
 	}
 
+	public List<BooksDto> getCartItems() {
+		List<Books> books = bookRepository.findAll();
+		List<Books> data = books.stream().filter((a) -> {
+			System.out.println("book:" + a);
+			if (a.isAddedToCart()) {
+				return true;
+			} else {
+				return false;
+			}
+		}).collect(Collectors.toList());
+
+		List<BooksDto> booksDto = new ArrayList<BooksDto>();
+		for (int i = 0; i < data.size(); i++) {
+			BooksDto dto = mapTOBookDto(data.get(i), new BooksDto());
+			booksDto.add(dto);
+		}
+
+		return booksDto;
+	}
 	public List<BooksDto> getAllBooks() {
 
 		List<Books> data = bookRepository.findAll();
@@ -74,14 +83,16 @@ public class BookService {
 	}
 
 	public BooksDto getBookById(int id) {
+		BooksDto dto = null;
 		Optional<Books> books = bookRepository.findById(id);
 		try {
 			bookEventProducer.sendLibraryEvent(books.get());
-		} catch (JsonProcessingException e) {
+			dto = mapTOBookDto(books.get(), new BooksDto());
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error sending the message");
 		}
-		BooksDto dto = mapTOBookDto(books.get(), new BooksDto());
+
 		return dto;
 	}
 
@@ -115,7 +126,7 @@ public class BookService {
 		booksDto.setPublisher(book.getPublisher());
 		booksDto.setStock(book.getStock());
 		booksDto.setViewDate(book.getViewDate());
-
+		booksDto.setAddedToCart(book.isAddedToCart());
 		return booksDto;
 	}
 
@@ -132,6 +143,7 @@ public class BookService {
 		book.setPublisher(booksDto.getPublisher());
 		book.setStock(booksDto.getStock());
 		book.setViewDate(booksDto.getViewDate());
+		book.setAddedToCart(booksDto.isAddedToCart());
 		return book;
 	}
 

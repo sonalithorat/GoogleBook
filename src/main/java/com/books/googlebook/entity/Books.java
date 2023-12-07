@@ -6,12 +6,13 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Books")
 
 public class Books {
-
+	
 	@Id
 	int id;
 	String name;
@@ -26,6 +27,15 @@ public class Books {
 	String about;
 	String publisher;
 	boolean isBorrowed;
+	boolean addedToCart;
+	
+	public boolean isAddedToCart() {
+		return addedToCart;
+	}
+
+	public void setAddedToCart(boolean addedToCart) {
+		this.addedToCart = addedToCart;
+	}
 
 	public boolean isBorrowed() {
 		return isBorrowed;

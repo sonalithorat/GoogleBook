@@ -30,12 +30,12 @@ public class BookEventProducer {
 
 	public CompletableFuture<SendResult<Integer, String>> sendLibraryEvent(Books book)
 			throws JsonProcessingException {
-		var key = book.getId();
-		var value = objectMapper.writeValueAsString(book);
+		int key = book.getId();
+		String value = objectMapper.writeValueAsString(book);
 
 		// 1 blocking call- get metadata about the kafka cluster
 		// 2. send messgae happens - return completable feature.
-		var completableFture = kafkaTemplate.send(topic, key, value);
+		CompletableFuture<SendResult<Integer, String>> completableFture = kafkaTemplate.send(topic, key, value);
 
 		return completableFture.whenComplete((sendResult, throwable) -> {
 			if (throwable != null) {

@@ -52,6 +52,13 @@ public class BooksController {
 		List<BooksDto> books = bookService.getRecentlyViewedBooks();
 		return ResponseEntity.status(HttpStatus.OK).body(books);
 	}
+	
+	@GetMapping("/getBook/cart")
+	public ResponseEntity<List<BooksDto>> getCartItems() {
+		List<BooksDto> books = bookService.getCartItems();
+		return ResponseEntity.status(HttpStatus.OK).body(books);
+	}
+	
 	@PutMapping("/update")
 	public ResponseEntity<BooksDto> update(@RequestBody BooksDto book) {
 		// Optional<List<Books>> books = booksRepository.g(name);

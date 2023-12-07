@@ -1,5 +1,6 @@
 #spring.data.mongodb.uri=mongodb+srv://root:root@googlebooks.3d6uop8.mongodb.net/?retryWrites=true&w=majority
-
+server:
+  port: 8081
 spring:
   data:
     mongodb:

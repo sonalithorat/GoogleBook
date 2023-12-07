@@ -18,10 +18,8 @@ import com.books.googlebook.service.BookService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,59 +53,60 @@ class BookEventProducerTest {
 	// @Test
 	void sendLibraryEvent() throws JsonProcessingException {
 		BooksDto dto = new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300, "technical", 660, 0,
-				"The book is written in such a way that", "Java", false);
+				"The book is written in such a way that", "Java", false, true);
 		Books book = bookService.mapTOBook(new Books(), dto);
 		var key = book.getId();
 		var value = objectMapper.writeValueAsString(book);
 		// when(objectMapper.writeValueAsString(book)).thenReturn(value);
 	}
-	
+
 	//@Test
-    void testSendLibraryEvent() throws JsonProcessingException, ExecutionException, InterruptedException {
-        // Arrange
-        Books book = new Books();
-        book.setId(123);
-        String jsonString = "{\"id\":123,\"title\":\"Book Title\"}";  // Use your actual serialization logic
+	void testSendLibraryEventas() throws JsonProcessingException {
+		// Given
+		Books book = new Books();
+		book.setId(123);
 
-        CompletableFuture<SendResult<Integer, String>> future = new CompletableFuture<SendResult<Integer,String>>();
-		RecordMetadata recordMetadata = new RecordMetadata(null, 0, 0, 0L, 0L, 0, 0);
+		String value = objectMapper.writeValueAsString(book);
+		when(objectMapper.writeValueAsString(book)).thenReturn(value);
+		// String jsonString = "{\"id\":123,\"title\":\"Book Title\"}"; // Use your
+		// actual serialization logic
 
-		SendResult<Integer, String> sendResult = new SendResult<>(new ProducerRecord<>("topic", 123, jsonString), recordMetadata);
-		//future.set(sendResult);
-        // Mock KafkaTemplate send method
-        when(kafkaTemplate.send(anyString(), anyInt(), anyString())).thenReturn(future);
+		// Mock the send method to return a CompletableFuture
+		CompletableFuture<SendResult<Integer, String>> completableFutureMock = mock(CompletableFuture.class);
+		when(kafkaTemplate.send(eq("topic"), eq(123), eq(value))).thenReturn(completableFutureMock);
 
-		 CompletableFuture<SendResult<Integer, String>> completableFuture = bookEventProducer.sendLibraryEvent(book);
+		// When
+		CompletableFuture<SendResult<Integer, String>> completableFutureActual = bookEventProducer
+				.sendLibraryEvent(book);
 
-        future.get();
-        //completableFuture.get(); // This will throw an exception if the CompletableFuture completes exceptionally
-        // Add further assertions as needed
-        verify(kafkaTemplate, times(1)).send("topic", 123, jsonString);
-        // Add more verifications or assertions based on your requirements
-    }
-    
-    //@Test
-    void testSendLibraryEvents() throws JsonProcessingException {
-        // Arrange
-        Books book = new Books();
-        book.setId(123);
-		var completableFture =mock(CompletableFuture.class);
-        String jsonString = "{\"id\":123,\"title\":\"Book Title\"}";  // Use your actual serialization logic
-
-        CompletableFuture<SendResult<Integer, String>> completableFuture = mock(CompletableFuture.class);
-        when(kafkaTemplate.send(anyString(), anyInt(), anyString())).thenReturn(completableFuture);
+		// Complete the CompletableFuture with a mocked SendResult
 		SendResult<Integer, String> sendResult = mock(SendResult.class);
-		//CompletableFuture<SendResult<Integer, String>> completableFuture = mock(CompletableFuture.class);
-        completableFuture = bookEventProducer.sendLibraryEvent(book);
+		completableFutureMock.complete(sendResult);
 
-        // Act
-        // Simulate completion with success
+		// Then
+		verify(kafkaTemplate, times(1)).send(anyString(), anyInt(), anyString());
 
-        completableFuture.complete(sendResult);
+		// Additional verification
+		assertNotNull(completableFutureActual);
+		assertEquals(completableFutureMock, completableFutureActual);
+		// Add more assertions based on your specific use case
+	}
 
-        // Assert
-        verify(kafkaTemplate, times(1)).send(anyString(), anyInt(), anyString());
-     
-       
-    }
+	//@Test
+	void testSendLibraryEvents() throws JsonProcessingException {
+
+		Books book = new Books();
+		book.setId(123);
+		String jsonString = "{\"id\":123,\"title\":\"Book Title\"}"; // Use your actual serialization logic
+
+		CompletableFuture<SendResult<Integer, String>> completableFuture = mock(CompletableFuture.class);
+
+		when(kafkaTemplate.send("topic", 123, jsonString)).thenReturn(completableFuture);
+		SendResult<Integer, String> sendResult = mock(SendResult.class);
+
+		completableFuture = bookEventProducer.sendLibraryEvent(book);
+		completableFuture.complete(sendResult);
+		verify(kafkaTemplate, times(1)).send(anyString(), anyInt(), anyString());
+
+	}
 }

@@ -58,10 +58,8 @@ class BooksControllerTest {
     	CompletableFuture<SendResult<Integer, String>> result = null;
     	Books book = new Books();
     	 BooksDto books = new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300,
-    			 "technical",660, 0, "The book is written in such a way that", "Java", false);
-         // Books book = new Books(1, "Java", "An Integrated Approach","Nageswara Rao",300,"technical")
+    			 "technical",660, 0, "The book is written in such a way that", "Java", false,true);
           Mockito.when(bookService.getBookById(1)).thenReturn(books);
-          //Mockito.when(bookEventProducer.sendLibraryEvent(null)).thenReturn(result);
           mockMvc.perform(get("/api/getBook/id/{id}", 1)
                   .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
@@ -83,14 +81,20 @@ class BooksControllerTest {
     }
 
     @Test
+    void getCartItems() throws Exception {
+        List<BooksDto> books = new ArrayList<>();
+        // Books book = new Books(1, "Java", "An Integrated Approach","Nageswara Rao",300,"technical")
+        Mockito.when(bookService.getCartItems()).thenReturn(books);
+        mockMvc.perform(get("/api/getBook/cart")
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+    }
+    @Test
     @DirtiesContext
     void update() throws Exception {
     	Books book = new Books();
    	  BooksDto books = new BooksDto(1, "Core Java", "An Integrated Approach", "Nageswara Rao", 300,
-   			 "technical",660, 0, "The book is written in such a way that", "Java", false);
-        // Books book = new Books(1, "Java", "An Integrated Approach","Nageswara Rao",300,"technical")
+   			 "technical",660, 0, "The book is written in such a way that", "Java", false, true);
          Mockito.when(bookService.updateBook(books)).thenReturn(books);
-         //Mockito.when(bookEventProducer.sendLibraryEvent(null)).thenReturn(result);
          mockMvc.perform(put("/api/update", 1)
                  .contentType(MediaType.APPLICATION_JSON)
                  .content(new ObjectMapper().writeValueAsString(books))).andExpect(status().isOk());

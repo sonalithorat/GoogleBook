@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 public class BooksDto {
 
-	
 	int id;
 	String name;
 	String description;
@@ -17,15 +16,23 @@ public class BooksDto {
 	String about;
 	String publisher;
 	boolean isBorrowed;
-	
-	
+
+	boolean addedToCart;
+
+	public boolean isAddedToCart() {
+		return addedToCart;
+	}
+
+	public void setAddedToCart(boolean addedToCart) {
+		this.addedToCart = addedToCart;
+	}
 
 	public BooksDto() {
 		super();
 	}
 
 	public BooksDto(int id, String name, String description, String author, int price, String category, int pageCount,
-			int stock, String about, String publisher, boolean isBorrowed) {
+			int stock, String about, String publisher, boolean isBorrowed, boolean addedToCart) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -39,6 +46,7 @@ public class BooksDto {
 		this.about = about;
 		this.publisher = publisher;
 		this.isBorrowed = isBorrowed;
+		this.addedToCart = addedToCart;
 	}
 
 	public boolean isBorrowed() {
@@ -135,13 +143,6 @@ public class BooksDto {
 
 	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	@Override
-	public String toString() {
-		return "Books [id=" + id + ", name=" + name + ", description=" + description + ", author=" + author + ", price="
-				+ price + ", category=" + category + ", pageCount=" + pageCount + ", viewDate=" + viewDate + ", stock="
-				+ stock + ", about=" + about + ", publisher=" + publisher + ", isBorrowed=" + isBorrowed + "]";
 	}
 
 }
