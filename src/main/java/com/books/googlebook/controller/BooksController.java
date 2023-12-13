@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,12 @@ public class BooksController {
 	
 	@PutMapping("/update")
 	public ResponseEntity<BooksDto> update(@RequestBody BooksDto book) {
+		// Optional<List<Books>> books = booksRepository.g(name);
+		BooksDto updatedBook = bookService.updateBook(book);
+		return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
+	}
+	@PostMapping("/create")
+	public ResponseEntity<BooksDto> create(@RequestBody BooksDto book) {
 		// Optional<List<Books>> books = booksRepository.g(name);
 		BooksDto updatedBook = bookService.updateBook(book);
 		return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
